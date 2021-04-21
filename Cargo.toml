@@ -1,0 +1,16 @@
+[package]
+name = "url-escape"
+version = "0.1.0"
+authors = ["Magic Len <len@magiclen.org>"]
+edition = "2018"
+repository = "https://github.com/magiclen/url-escape"
+homepage = "https://magiclen.org/url-escape"
+keywords = ["url", "escape", "unescape", "encode", "decode"]
+categories = ["encoding"]
+description = "This library is for encoding/escaping special characters in URLs and decoding/unescaping URLs as well."
+readme = "README.md"
+license = "MIT"
+include = ["src/**/*", "Cargo.toml", "README.md", "LICENSE"]
+
+[dependencies]
+percent-encoding = "2.1"
