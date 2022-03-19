@@ -1,5 +1,3 @@
-extern crate url_escape;
-
 const TEXT_WWW_FORM_URLENCODED_CASES: [(&str, &str); 7] = [
     ("", ""),
     ("%E5%93%88%E5%9B%89%EF%BC%8C%E4%B8%AD%E6%96%87%EF%BC%81", "哈囉，中文！"),

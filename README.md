@@ -14,16 +14,12 @@ This crate provides some `encode_*` functions to encode URL text in different si
 For example, to put a text to a fragment, use the `encode_fragment` function.
 
 ```rust
-extern crate url_escape;
-
 assert_eq!("a%20%3E%20b?", url_escape::encode_fragment("a > b?"));
 ```
 
 The functions suffixed with `_to_writer`, `_to_vec` or `_to_string` are useful to generate URL text.
 
 ```rust
-extern crate url_escape;
-
 let mut url = String::from("https://");
 assert_eq!("admin%40example.com", url_escape::encode_userinfo_to_string("admin@example.com", &mut url));
 url.push_str("@127.0.0.1/");
@@ -39,8 +35,6 @@ assert_eq!("https://admin%40example.com@127.0.0.1/%E4%B8%AD%E6%96%87%E5%AD%97/en
 ### Decoding
 
 ```rust
-extern crate url_escape;
-
 assert_eq!("中文字/eng/12 34", url_escape::decode("%E4%B8%AD%E6%96%87%E5%AD%97/eng/12%2034"));
 ```
 

@@ -1,8 +1,8 @@
 [package]
 name = "url-escape"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Magic Len <len@magiclen.org>"]
-edition = "2018"
+edition = "2021"
 repository = "https://github.com/magiclen/url-escape"
 homepage = "https://magiclen.org/url-escape"
 keywords = ["url", "escape", "unescape", "encode", "decode"]
