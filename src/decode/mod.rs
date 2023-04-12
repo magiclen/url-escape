@@ -1,6 +1,8 @@
-use std::borrow::Cow;
-use std::io::{self, Write};
-use std::str::from_utf8_unchecked;
+use std::{
+    borrow::Cow,
+    io::{self, Write},
+    str::from_utf8_unchecked,
+};
 
 use crate::percent_encoding::percent_decode_str;
 

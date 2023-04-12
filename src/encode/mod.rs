@@ -1,16 +1,17 @@
 // Ref: https://url.spec.whatwg.org/
 
-use std::borrow::Cow;
-use std::io::{self, Write};
-use std::str::from_utf8_unchecked;
-
-use crate::percent_encoding::{utf8_percent_encode, AsciiSet};
+use std::{
+    borrow::Cow,
+    io::{self, Write},
+    str::from_utf8_unchecked,
+};
 
 /// The C0 control percent-encode set are the C0 controls and U+007F (DEL).
 pub use percent_encoding::CONTROLS;
-
 /// Not an ASCII letter or digit.
 pub use percent_encoding::NON_ALPHANUMERIC;
+
+use crate::percent_encoding::{utf8_percent_encode, AsciiSet};
 
 /// The fragment percent-encode set is the C0 control percent-encode set and U+0020 SPACE, U+0022 ("), U+003C (<), U+003E (>), and U+0060 (`).
 pub const FRAGMENT: &AsciiSet = &CONTROLS.add(b' ').add(b'"').add(b'<').add(b'>').add(b'`');

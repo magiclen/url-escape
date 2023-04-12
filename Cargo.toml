@@ -3,6 +3,7 @@ name = "url-escape"
 version = "0.1.1"
 authors = ["Magic Len <len@magiclen.org>"]
 edition = "2021"
+rust-version = "1.59"
 repository = "https://github.com/magiclen/url-escape"
 homepage = "https://magiclen.org/url-escape"
 keywords = ["url", "escape", "unescape", "encode", "decode"]
