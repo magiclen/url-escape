@@ -109,7 +109,7 @@ macro_rules! encode_impl {
         ///
         $(#[$attr])*
         #[inline]
-        pub fn $encode_name<S: ?Sized + AsRef<str>>(text: &S) -> Cow<str> {
+        pub fn $encode_name<S: ?Sized + AsRef<str>>(text: &S) -> Cow<'_,str> {
             encode(text, $escape_set)
         }
 
