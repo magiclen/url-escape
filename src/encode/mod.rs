@@ -81,7 +81,9 @@ pub fn encode_to_vec<'a, S: AsRef<str>>(
 
     let pe = utf8_percent_encode(text, ascii_set);
 
-    output.extend(pe.flat_map(|e| e.bytes()));
+    for s in pe {
+        output.extend_from_slice(s.as_bytes());
+    }
 
     &output[current_length..]
 }
@@ -398,7 +400,9 @@ pub fn encode_www_form_urlencoded_to_vec<S: AsRef<str>>(text: S, output: &mut Ve
 
         let pe = utf8_percent_encode(part, X_WWW_FORM_URLENCODED);
 
-        output.extend(pe.flat_map(|e| e.bytes()));
+        for s in pe {
+            output.extend_from_slice(s.as_bytes());
+        }
     }
 
     &output[current_length..]
