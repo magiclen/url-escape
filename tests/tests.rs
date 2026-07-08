@@ -50,6 +50,14 @@ fn decode_www_form_urlencoded_to_string() {
 }
 
 #[test]
+fn decode_invalid_utf8_percent_bytes_lossily() {
+    let mut s = String::new();
+
+    assert_eq!("\u{FFFD}", url_escape::decode("%FF"));
+    assert_eq!("\u{FFFD}", url_escape::decode_to_string("%FF", &mut s));
+}
+
+#[test]
 fn decode_www_form_urlencoded_to_writer() {
     for (text, expect) in TEXT_WWW_FORM_URLENCODED_CASES.iter().copied() {
         let mut v = Vec::new();

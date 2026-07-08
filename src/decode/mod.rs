@@ -1,7 +1,6 @@
 use std::{
     borrow::Cow,
     io::{self, Write},
-    str::from_utf8_unchecked,
 };
 
 use crate::percent_encoding::percent_decode_str;
@@ -14,10 +13,15 @@ pub fn decode<S: ?Sized + AsRef<str>>(text: &S) -> Cow<'_, str> {
     pd.decode_utf8_lossy()
 }
 
-/// Decode percent-encoded bytes in a given string to a mutable `String` reference and return the decoded string slice.
+/// Decode percent-encoded bytes in a given string to a mutable `String` reference with lossy UTF-8 and return the decoded string slice.
 #[inline]
 pub fn decode_to_string<S: AsRef<str>>(text: S, output: &mut String) -> &str {
-    unsafe { from_utf8_unchecked(decode_to_vec(text, output.as_mut_vec())) }
+    let current_length = output.len();
+    let pd = percent_decode_str(text.as_ref());
+
+    output.push_str(&pd.decode_utf8_lossy());
+
+    &output[current_length..]
 }
 
 /// Decode percent-encoded bytes in a given string to a mutable `Vec<u8>` reference and return the decoded data slice.
