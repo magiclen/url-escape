@@ -24,10 +24,10 @@ pub const QUERY: &AsciiSet = &CONTROLS.add(b' ').add(b'"').add(b'#').add(b'<').a
 /// The special-query percent-encode set is the query percent-encode set and U+0027 (').
 pub const SPECIAL_QUERY: &AsciiSet = &QUERY.add(b'\'');
 
-/// The path percent-encode set is the query percent-encode set and U+003F (?), U+0060 (`), U+007B ({), and U+007D (}).
-pub const PATH: &AsciiSet = &QUERY.add(b'?').add(b'`').add(b'{').add(b'}');
+/// The path percent-encode set is the query percent-encode set and U+003F (?), U+005E (^), U+0060 (`), U+007B ({), and U+007D (}).
+pub const PATH: &AsciiSet = &QUERY.add(b'?').add(b'^').add(b'`').add(b'{').add(b'}');
 
-/// The userinfo percent-encode set is the path percent-encode set and U+002F (/), U+003A (:), U+003B (;), U+003D (=), U+0040 (@), U+005B ([) to U+005E (^), inclusive, and U+007C (|).
+/// The userinfo percent-encode set is the path percent-encode set and U+002F (/), U+003A (:), U+003B (;), U+003D (=), U+0040 (@), U+005B ([) to U+005D (]), inclusive, and U+007C (|).
 pub const USERINFO: &AsciiSet = &PATH
     .add(b'/')
     .add(b':')
@@ -37,7 +37,6 @@ pub const USERINFO: &AsciiSet = &PATH
     .add(b'[')
     .add(b'\\')
     .add(b']')
-    .add(b'^')
     .add(b'|');
 
 /// The component percent-encode set is the userinfo percent-encode set and U+0024 ($) to U+0026 (&), inclusive, U+002B (+), and U+002C (,).
@@ -222,6 +221,7 @@ encode_impl! {
     /// * `<`
     /// * `>`
     /// * `?`
+    /// * `^`
     /// * <code>&#096;</code>
     /// * `{`
     /// * `}`
@@ -319,49 +319,110 @@ encode_impl! {
     encode_component_to_writer;
 }
 
-encode_impl! {
-    /// The following characters are escaped:
-    ///
-    /// C0 controls and,
-    ///
-    /// * SPACE
-    /// * `!`
-    /// * `"`
-    /// * `#`
-    /// * `$`
-    /// * `%`
-    /// * `&`
-    /// * `'`
-    /// * `(`
-    /// * `)`
-    /// * `+`
-    /// * `,`
-    /// * `/`
-    /// * `:`
-    /// * `;`
-    /// * `<`
-    /// * `=`
-    /// * `>`
-    /// * `?`
-    /// * `@`
-    /// * `[`
-    /// * `\`
-    /// * `]`
-    /// * `^`
-    /// * <code>&#096;</code>
-    /// * `{`
-    /// * `}`
-    /// * `|`
-    /// * `~`
-    ///
-    /// and all code points greater than `~` (U+007E) are escaped.
-    X_WWW_FORM_URLENCODED;
-    /// Encode text as a www-form-urlencoded text.
-    encode_www_form_urlencoded;
-    /// Write text as a urlencoded text to a mutable `String` reference and return the encoded string slice.
-    encode_www_form_urlencoded_to_string;
-    /// Write text as a www-form-urlencoded text to a mutable `Vec<u8>` reference and return the encoded data slice.
-    encode_www_form_urlencoded_to_vec;
-    /// Write text as a www-form-urlencoded text to a writer.
-    encode_www_form_urlencoded_to_writer;
+/// Encode text as a www-form-urlencoded text.
+///
+/// Decode the output with `decode_www_form_urlencoded` because `+` represents a space in this format.
+///
+/// The following characters are escaped:
+///
+/// C0 controls and,
+///
+/// * SPACE
+/// * `!`
+/// * `"`
+/// * `#`
+/// * `$`
+/// * `%`
+/// * `&`
+/// * `'`
+/// * `(`
+/// * `)`
+/// * `+`
+/// * `,`
+/// * `/`
+/// * `:`
+/// * `;`
+/// * `<`
+/// * `=`
+/// * `>`
+/// * `?`
+/// * `@`
+/// * `[`
+/// * `\`
+/// * `]`
+/// * `^`
+/// * <code>&#096;</code>
+/// * `{`
+/// * `}`
+/// * `|`
+/// * `~`
+///
+/// and all code points greater than `~` (U+007E) are escaped.
+#[inline]
+pub fn encode_www_form_urlencoded<S: ?Sized + AsRef<str>>(text: &S) -> Cow<'_, str> {
+    let text = text.as_ref();
+
+    if text.as_bytes().contains(&b' ') {
+        let mut output = String::new();
+
+        encode_www_form_urlencoded_to_string(text, &mut output);
+
+        Cow::Owned(output)
+    } else {
+        encode(text, X_WWW_FORM_URLENCODED)
+    }
+}
+
+/// Write text as a urlencoded text to a mutable `String` reference and return the encoded string slice.
+///
+/// Decode the output with `decode_www_form_urlencoded_to_string` because `+` represents a space in this format.
+#[inline]
+pub fn encode_www_form_urlencoded_to_string<S: AsRef<str>>(text: S, output: &mut String) -> &str {
+    unsafe { from_utf8_unchecked(encode_www_form_urlencoded_to_vec(text, output.as_mut_vec())) }
+}
+
+/// Write text as a www-form-urlencoded text to a mutable `Vec<u8>` reference and return the encoded data slice.
+///
+/// Decode the output with `decode_www_form_urlencoded_to_vec` because `+` represents a space in this format.
+pub fn encode_www_form_urlencoded_to_vec<S: AsRef<str>>(text: S, output: &mut Vec<u8>) -> &[u8] {
+    let text = text.as_ref();
+
+    output.reserve(text.len());
+
+    let current_length = output.len();
+
+    for (index, part) in text.split(' ').enumerate() {
+        if index > 0 {
+            output.push(b'+');
+        }
+
+        let pe = utf8_percent_encode(part, X_WWW_FORM_URLENCODED);
+
+        output.extend(pe.flat_map(|e| e.bytes()));
+    }
+
+    &output[current_length..]
+}
+
+/// Write text as a www-form-urlencoded text to a writer.
+///
+/// Decode the output with `decode_www_form_urlencoded_to_writer` because `+` represents a space in this format.
+#[inline]
+pub fn encode_www_form_urlencoded_to_writer<S: AsRef<str>, W: Write>(
+    text: S,
+    output: &mut W,
+) -> Result<(), io::Error> {
+    for (index, part) in text.as_ref().split(' ').enumerate() {
+        if index > 0 {
+            output.write_all(b"+")?;
+        }
+
+        let pe = utf8_percent_encode(part, X_WWW_FORM_URLENCODED);
+
+        for s in pe {
+            output.write_all(s.as_bytes())?;
+        }
+    }
+
+    Ok(())
 }

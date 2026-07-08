@@ -32,6 +32,13 @@ assert_eq!(r"a=1&b=a%20b%20c", url_escape::encode_query_to_string("a=1&b=a b c",
 assert_eq!("https://admin%40example.com@127.0.0.1/%E4%B8%AD%E6%96%87%E5%AD%97/eng/12%2034/56%2F78?a=1&b=a%20b%20c", url);
 ```
 
+Use `encode_www_form_urlencoded` for form data and decode it with `decode_www_form_urlencoded`.
+
+```rust
+assert_eq!("a+b%2Bc", url_escape::encode_www_form_urlencoded("a b+c"));
+assert_eq!("a b+c", url_escape::decode_www_form_urlencoded("a+b%2Bc"));
+```
+
 ### Decoding
 
 ```rust
