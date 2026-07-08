@@ -13,4 +13,4 @@ license = "MIT"
 include = ["src/**/*", "Cargo.toml", "README.md", "LICENSE"]
 
 [dependencies]
-percent-encoding = "2.1"
+percent-encoding = "2"

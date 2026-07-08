@@ -8,7 +8,7 @@ use crate::percent_encoding::percent_decode_str;
 
 /// Decode percent-encoded bytes in a given string.
 #[inline]
-pub fn decode<S: ?Sized + AsRef<str>>(text: &S) -> Cow<str> {
+pub fn decode<S: ?Sized + AsRef<str>>(text: &S) -> Cow<'_, str> {
     let pd = percent_decode_str(text.as_ref());
 
     pd.decode_utf8_lossy()
